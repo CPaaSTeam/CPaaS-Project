@@ -39,7 +39,7 @@
 <span id="content"></span>
 # 正文
 <span id="1"></span>
-## 一、Gitx详解
+## 一、Git详解
 
 <span id="1-1"></span>
 ### 1、GIT入门
