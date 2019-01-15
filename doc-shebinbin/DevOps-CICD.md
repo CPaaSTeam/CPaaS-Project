@@ -68,7 +68,7 @@
 #### 1.4 分布式版本控制系统
 于是分布式版本控制系统（ Distributed Version Control System，简称 DVCS ）面世了。在这类系统中，像 Git，Mercurial，Bazaar 以及 Darcs 等，客户端并不只提取最新版本的文件快照，而是把代码仓库完整地镜像下来。这么一来，任何一处协同工作用的服务器发生故障，事后都可以用任何一个镜像出来的本地仓库恢复。因为每一次的提取操作，实际上都是一次对代码仓库的完整备份（见图1.3）。
 <div align="center">
-<img src="./Pictures/dvcs.png" width = "40%" height = "40%"/>
+<img src="./Pictures/dvcs.png" width = "50%" height = "50%"/>
 <div>图1.3 分布式版本控制系统</div>
 </div>
 
