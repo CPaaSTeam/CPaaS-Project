@@ -3,7 +3,7 @@
 ## 1.什么是容器镜像生命周期管理
 大规模使用容器作为服务运行载体的情况下，如果容器镜像升级更新了，如果没有有效的容器镜像生命周期管理，那么种类繁多的容器镜像升级更新对于运维人员来说简直是灾难。
 <div align="center">
-<img src="./Pictures/cicdflow.png" width = "75%" height = "75%"/>
+<img src="./Pictures/cicdflow.png" width = "90%" height = "90%"/>
 <div>图1-1 企业级——开发、持续集成、持续部署流程</div>
 </div>
 
@@ -14,7 +14,7 @@
 
 ### 2.1 方案一
 <div align="center">
-<img src="./Pictures/dockerlife-1.png" width = "70%" height = "70%"/>
+<img src="./Pictures/dockerlife-1.png" width = "80%" height = "80%"/>
 <div>图2.1-1 方案一</div>
 </div>
 
@@ -61,7 +61,7 @@ docker load -i new-rhel.tar
 
 ### 2.2 方案二
 <div align="center">
-<img src="./Pictures/dockerlife-2.png" width = "70%" height = "70%"/>
+<img src="./Pictures/dockerlife-2.png" width = "90%" height = "90%"/>
 <div>图2.2-1 方案二</div>
 </div>
 
