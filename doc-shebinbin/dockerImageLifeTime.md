@@ -38,17 +38,50 @@
 4. 通过docker rmi 命令删除旧版镜像
 5. 重新执行 docker build命令，构建latest版本镜像。
 
-在如下图的目录下：
+构建镜像目录如下图：
 <div align="center">
 <img src="./Pictures/tree-1.png" width = "25%" height = "25%"/>
 <div>图2.1-2 镜像仓库服务器目录</div>
 </div>
 
-可执行自动化脚本：
-<div align="center">
-<img src="./Pictures/updateScript.png" width = "40%" height = "40%"/>
-<div>图2.1-3 基础镜像升级脚本</div>
-</div>
+执行自动化脚本，更新“基础镜像”：
+```shell
+#！/bin/bash
+
+if [ -n "$1" ];then
+imageVersion=$1
+else
+imageVersion=oldest
+fi
+
+docker tag rhel7.5:latest  rhel7.5:$imageVersion
+docker rmi rhel7.5:latest
+```
+
+可执行自动化脚本，构建“基础平台镜像”：
+
+```shell
+#! /bin/bash
+
+if [ -n "$1" ];then
+imageVersion=$1
+else
+imageVersion=oldest
+fi
+
+dirs=(
+"MysqlImage"
+"RedisImage"
+"TomcatImage"
+)
+
+for dir in ${dirs[@]}
+do
+    docker tag $dir:latest $dir:$imageVersion
+    docker rmi $dir:latest
+    docker build -t $dir:latest "./$dir"
+done
+```
 
 ---
 
