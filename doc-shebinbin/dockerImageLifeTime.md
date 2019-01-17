@@ -3,8 +3,6 @@
 ## 1.什么是容器镜像生命周期管理
 容器的使用离不开镜像。以Docker为代表的容器技术，可以将应用打包成标准格式的镜像，并且应用会以容器的方式再度启用运行。在真正的生产环境中，我们会需要大量的镜像，第三方或者是自建的；大量镜像伴随而来的是需要保存、分发、使用、升级更新等管控工作。
 
-我们现在讨论：在大规模使用容器作为服务运行载体的情况下，如果容器镜像升级更新了，如何保证生产上子镜像的更新。
-
 如果没有有效的容器镜像生命周期管理，那么种类繁多的容器镜像升级更新对于运维人员来说简直是灾难。
 
 为了使大家在CICD场景中，对容器镜像生命周期管理有一个更加直观的观察。请看下图：
@@ -24,6 +22,13 @@
 
 ## 2.如何进行容器镜像生命周期管理
 
+<div align="center">
+<img src="./Pictures/dockerLife-3.png" width = "90%" height = "90%"/>
+<div>图2-1 容器镜像生命周期流程图</div>
+</div>
+
+## 3.在大规模使用容器作为服务运行载体的情况下，如果基础镜像升级了，如何保证子镜像版本也能够升级。
+我们现在讨论：在大规模使用容器作为服务运行载体的情况下，如果容器镜像升级更新了，如何保证生产上子镜像的更新。
 ### 2.1 方案一
 <div align="center">
 <img src="./Pictures/dockerlife-1.png" width = "100%" height = "100%"/>
@@ -35,14 +40,25 @@
 1. 每一层级的容器镜像通过Dockerfile相关联。
 2. Dockerfile在每一次BaseImage升级更新中，不用做任何更改。
 3. 更新BaseImage之后，执行docker tag 命令，将旧版本的子镜像重命名为其他版本，如v5。
-4. 通过docker rmi 命令删除旧版镜像
+4. 通过docker rmi 命令删除旧版镜像tag标签。
 5. 重新执行 docker build命令，构建latest版本镜像。
 
 构建镜像目录如下图：
-<div align="center">
-<img src="./Pictures/tree-1.png" width = "25%" height = "25%"/>
-<div>图2.1-2 镜像仓库服务器目录</div>
-</div>
+```shell
+../build-docker
+├── MysqlImage
+│   ├── Dockerfile
+│   └── mysql.tar.gz
+├── RedisImage
+│   ├── Dockerfile
+│   └── Redis.tar.gz
+├── TomcatImage
+│   ├── Dockerfile
+│   └── tomcat-8.tat.gz
+└── update.sh
+
+3 directories, 7 files
+```
 
 执行自动化脚本，更新“基础镜像”：
 ```shell
