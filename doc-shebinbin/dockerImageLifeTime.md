@@ -46,7 +46,7 @@
 
 执行自动化脚本，更新“基础镜像”：
 ```shell
-#！/bin/bash
+#!/bin/bash
 
 if [ -n "$1" ];then
 imageVersion=$1
@@ -61,7 +61,7 @@ docker rmi rhel7.5:latest
 可执行自动化脚本，构建“基础平台镜像”：
 
 ```shell
-#! /bin/bash
+#!/bin/bash
 
 if [ -n "$1" ];then
 imageVersion=$1
