@@ -178,20 +178,75 @@ http://git-scm.com/download
 wget https://github.com/git/git/archive/v2.20.1.tar.gz
 ```
 
+<div align="center">
+<img src="./Pictures/gitaz1.png" width = "97%" height = "97%"/>
+<div>图1.4.1-1 从GitHub上下载Git源代码包（1）</div>
+</div>
+
+<div align="center">
+<img src="./Pictures/gitaz2.png" width = "97%" height = "970%"/>
+<div>图1.4.1-1 从GitHub上下载Git源代码包（2）</div>
+</div>
+
 编译和安装：
 
 ```shell
-$ tar -zxf git-1.7.2.2.tar.gz
-$ cd git-1.7.2.2
-$ make prefix=/usr/local all
-$ sudo make prefix=/usr/local install
+$ tar -zxf git-v2.20.1.tar.gz
+$ cd git-v2.20.1
+$ make prefix=/usr/local/git all
+$ sudo make prefix=/usr/local/git install
 ```
 
+安装完成之后执行 git version，有些用户可能发现还是旧版本。可执行如下命令：
 
+```shell
+# 找出旧版本git 可执行文件的路径
+$ whereis git
+git: /usr/bin/git /usr/share/man/man1/git.1.gz
+# 将原来的git可执行文件或者软链接备份
+sudo mv /usr/bin/git /usr/bin/git.bak
+# 将安装目录下的最新版Git可执行文件,通过软连接方式链接到/usr/bin/git
+sudo ln -s /usr/local/git/git  /usr/bin/git
+```
 
+如果出现如下结果，则安装成功。
 
+```shell
+$ git version
+git version 2.20.1
+```
 
+##### 1.4.2 二进制文件安装
 
+**Debian系的Linux**
+
+```shell
+$ sudo add-apt-repository ppa:git-core/ppa
+$ sudo apt update
+$ sudo apt install git
+```
+
+以上是安装最新版本的Git方式，如果没有最新版本Git 的需求，执行如下命令：
+
+```shell
+sudo apt-get install git
+```
+
+**RedHat系的Linux**
+
+```shell
+sudo yum install git 
+```
+
+以上命令只安装yum源中的版本，如需使用最新版本，建议使用源码编译方式安装。
+
+**Windows**
+
+可在[Git官网](https://git-scm.com/downloads)下载Windows版本的.exe格式二进制文件进行安装即可。
+
+**Mac OS X**
+
+可在[Git官网](https://git-scm.com/downloads)下载Mac OS X版本的.dmg格式二进制文件进行安装即可。
 
 <span id="1-2"></span>
 
