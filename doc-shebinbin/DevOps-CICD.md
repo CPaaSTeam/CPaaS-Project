@@ -97,9 +97,10 @@ Git中的任何一个文件，都只有三种状态：
 3. committed （已提交）
 
 <div align="center">
-<img src="./Pictures/gitszzt1.png" width = "95%" height = "95%"/>
+<img src="./Pictures/gitszzt2.png" width = "95%" height = "95%"/>
 <div>图1.3.2-1 Git工作区、暂存区、仓库</div>
 </div>
+
 
 当在工作区新增或者修改了某个文件，那么该文件就处于modified状态。如果现在进行上图中的操作①，那么Git就会将该文件作一个快照保存在暂存区，该文件就处于staged状态。接下来，如果该文件进行了上图中的操作②，那么Git将保存在暂存区域的文件快照永久转储到 Git 目录中，该文件就处于committed状态了。
 
@@ -297,15 +298,52 @@ git help config
 
 ### 2、Git操作和管理
 
->  光大科技公司Git命令操作规范，Git分支管理
+>  光大科技公司Git命令操作规范，Git分支管理，简短有力、全面、能进能退，收放自如。
 
-该章节，我试图使用非常简单的图文来向大家描述Git操作命令，每个参数都有示例并告诉大家这些参数的区别。
+现代工业体系中的项目运作从来不是一个人独角戏，必定是多人协作。软件工程也不是计算机产业上古时期某个程序员两三天弄出来的小demo。这一章节我们将讨论如何使用Git参与到项目的协作中来。
 
-简短有力、全面、能进能退，收放自如。
+我试图使用非常简单的图文来向大家描述Git操作命令，每个参数都有示例并告诉大家这些参数的区别。
+
+Git中仓库以及仓库之间的关系和操作，可以使用下图进行简单说明：
+
+<div align="center">
+<img src="./Pictures/gitcz4.png" width = "99%" height = 200 />
+<div>图2-1 Git操作与仓库之间的关系</div>
+</div>
 
 #### 2.1 Git远程仓库
 
+要参与到Git项目的协作，我们首先需要了解远程仓库。远程仓库是指托管在网络上的Git仓库，可能有多个，有些是只读镜像，另外的是可写。同他人协作开发某个项目时，需要管理这些远程仓库，以便推送或拉取数据，分享各自的工作进展。管理远程仓库的工作，包括添加远程库，移除废弃的远程库。本节我们将详细讨论远程库的管理和使用。
 
+**查看当前仓库配置的远程仓库**
+
+```shell
+$ git remote
+origin
+```
+
+它会列出每个远程仓库的别名。如果什么都没有输出，那么需要clone一个远程仓库，下图为获取远程仓库链接：
+
+<div align="center">
+<img src="./Pictures/gitclone1.png" width = "99%" height = 200 />
+<div>图2.1-1 如何获取Git远程仓库链接</div>
+</div>
+
+```shell
+$ git clone https://github.com/git/git.git  gitHubAlias
+```
+
+命令中的 “gitHubAlias” 为自定义的名字，仓库将处于这个自定义名字的文件夹下，如果不填，那么这个仓库的文件夹名默认为远程仓库的名字。
+
+```shell
+$ cd gitHubAlias
+# -v 参数可以查看远程仓库的链接。
+$ git remote -v
+origin	git@github.com:git/git.git (fetch)
+origin	git@github.com:git/git.git (push)
+```
+
+在clone完一个仓库之后，至少可以看到一个名为origin的远程仓库，Git默认使用origin来表示我们所clone的原始仓库。
 
 #### 2.2 获取Git仓库
 
@@ -316,6 +354,8 @@ git help config
 #### 2.5 Git中打版本标签
 
 #### 2.6 Git分支管理
+
+管理各式远程库分支，定义是否跟踪这些分支，等等
 
 #### 2.7 Git别名以及命令自动补全
 
@@ -329,11 +369,21 @@ git help config
 
 从易于项目管理的角度去看Git ，如何使得Git成为项目管理的利器，而不是简单的只是使用。
 
-### 5、企业级Git服务器搭建
-
 webhook
 
-### 6、Git生产其他使用场景讨论
+### 5、企业级Git远程服务器搭建
+
+容器化？
+
+云？
+
+gogs而不是gitlab？
+
+
+
+### 6、GitOps
+
+生产其他使用场景讨论
 
 ### 7、本章总结
 
