@@ -326,8 +326,9 @@ origin
 
 <div align="center">
 <img src="./Pictures/gitclone1.png" width = "99%" height = "100%" />
-<div>图2.1-1 如何获取远程仓库链接</div>
+<div>图2.1-1 获取远程仓库链接</div>
 </div>
+
 
 
 ```shell
