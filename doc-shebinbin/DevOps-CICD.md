@@ -138,12 +138,11 @@ wget https://github.com/git/git/archive/v2.20.1.tar.gz
 ```
 
 <div align="center">
-<img src="./Pictures/gitaz1.png" width = "97%" height = "97%"/>
+<img src="./Pictures/gitaz1.png" width = "99%" height = "100%"/>
 <div>图1.4.1-1 从GitHub上下载Git源代码包（1）</div>
 </div>
-
 <div align="center">
-<img src="./Pictures/gitaz2.png" width = "97%" height = "970%"/>
+<img src="./Pictures/gitaz2.png" width = "99%" height = "100%"/>
 <div>图1.4.1-1 从GitHub上下载Git源代码包（2）</div>
 </div>
 
@@ -307,9 +306,10 @@ git help config
 Git中仓库以及仓库之间的关系和操作，可以使用下图进行简单说明：
 
 <div align="center">
-<img src="./Pictures/gitcz4.png" width = "99%" height = 200 />
+<img src="./Pictures/gitcz4.png" width = "99%" height = 100% />
 <div>图2-1 Git操作与仓库之间的关系</div>
 </div>
+
 
 #### 2.1 Git远程仓库
 
@@ -325,9 +325,10 @@ origin
 它会列出每个远程仓库的别名。如果什么都没有输出，那么需要clone一个远程仓库，下图为获取远程仓库链接：
 
 <div align="center">
-<img src="./Pictures/gitclone1.png" width = "99%" height = 200 />
-<div>图2.1-1 如何获取Git远程仓库链接</div>
+<img src="./Pictures/gitclone1.png" width = "99%" height = "100%" />
+<div>图2.1-1 如何获取远程仓库链接</div>
 </div>
+
 
 ```shell
 $ git clone https://github.com/git/git.git  gitHubAlias
