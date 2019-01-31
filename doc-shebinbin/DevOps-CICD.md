@@ -301,41 +301,163 @@ git help config
 
 现代工业体系中的项目运作从来不是一个人独角戏，必定是多人协作。软件工程也不是计算机产业上古时期某个程序员两三天弄出来的小demo。这一章节我们将讨论如何使用Git参与到项目的协作中来。
 
-我试图使用非常简单的图文来向大家描述Git操作命令，每个参数都有示例并告诉大家这些参数的区别。
+我试图使用非常简单的图文来向大家描述Git操作命令，每个参数都有示例并告诉大家这些参数的区别。在进行详细的说明之前，大家可以通过图2-1对Git仓库之间的流转有一个整体的了解。
 
-Git中仓库以及仓库之间的关系和操作，可以使用下图进行简单说明：
+<img src="./Pictures/gitcz4.png" style="width:100px height:300px"/>
 
-<div align="center">
-<img src="./Pictures/gitcz4.png" width = "99%" height = 100% />
-<div>图2-1 Git操作与仓库之间的关系</div>
-</div>
+<div align="center">图2-1 Git操作与仓库之间的关系</div>
 
+#### 2.1 与Git远程仓库交互
 
-#### 2.1 Git远程仓库
+要参与到Git项目的协作，我们首先需要了解远程仓库。远程仓库是指托管在网络上的Git仓库，可能有多个，有些是只读镜像，另外的是可写。同他人协作开发某个项目时，需要管理这些远程仓库，以便推送或拉取数据，分享各自的工作进展。管理远程仓库的工作，包括添加远程库，移除废弃的远程库。
 
-要参与到Git项目的协作，我们首先需要了解远程仓库。远程仓库是指托管在网络上的Git仓库，可能有多个，有些是只读镜像，另外的是可写。同他人协作开发某个项目时，需要管理这些远程仓库，以便推送或拉取数据，分享各自的工作进展。管理远程仓库的工作，包括添加远程库，移除废弃的远程库。本节我们将详细讨论远程库的管理和使用。
+本小节我们将详细讨论与Git远程库的交互，我们将以场景的方式来描述Git远程仓库的使用。
 
-**查看当前仓库配置的远程仓库**
+##### **2.1.1：在Git服务器中添加Git客户端的SSH KEY**
 
 ```shell
-$ git remote
-origin
+# 在Git客户端中执行如下命令；
+$ ssh-keygen -t rsa -b 4096 -f  keyFileName -q -N "newPasswd" -C "this is a comment."
+# -t key的类型，默认rsa；-b key的字节数，默认2048；-f key写在哪个文件中
+# -C 注释；-q 静默执行；-N 设置rsa新密码
+# 查看当前目录将会有两个文件
+$ ls
+keyFileName  keyFileName.pub
+$ cat keyFileName.pub
 ```
 
-它会列出每个远程仓库的别名。如果什么都没有输出，那么需要clone一个远程仓库，下图为获取远程仓库链接：
+公钥字符串，将如下字符串粘贴至Git服务器中：
 
-<div align="center">
-<img src="./Pictures/gitclone1.png" width = "99%" height = "100%" />
-<div>图2.1-1 获取远程仓库链接</div>
-</div>
+```tex
+ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQC1wPUf9iInniRzEjhl3B9IOlsNnnPs7habIftsrjyiDmNEBOrkHNgoLquY4TTk2eZE8ljwzSSk3IYmFaBf37YNqb1gZIoQQ2z51fhCtNEBnJIVe7ZebaEd/0UMpb9c5qt9a/QbAFWMD4udixq/hgcGCQYnRq0oOk3p6wXJrllDqf/mk97BTVboXXrinPtS5MS2DLT5wd8rgkiZSJlXVp/6jaXNGM44lYK8qq1vGwRFywXmyYALl1sV43ktybqH6zwq3ZIsDAVDLST7FZX8Qp+Flg0II6+BGWelXvhHTfDSrkxL5UD0jHfzTtma+FOx9NNL5YesngqBuyWeRmozQfm/+uv2FQxVQ3CFv/+3njW12+eRAfb6eQzQgnahKlGKY7xoijc6agdWAiEP13jCOlfgIs4ZEYMGOoA+vlQu21ENTxwbuwMGfrZ8xizPsrHQtcWv/75h0xlZWKJ6P8OuAGel86l3lyA2YdBNNQfxsXMK4ECiYV70LnYJPhevR5ekOc4jZbomrqu16ex98TQpk2h+S2ju0OFzlSc9E3poufSd3Z5ZhyzOsDm2lFTg8m5KELd90LIm9aBRQ628SxqDnYHV+84PWPDNrVsu0o6bh//ln1WT5J9WU16U5HslYPl9NCFbbAXJHti63tsKz99YrCDFezRIk0nKPHSfwMZjKJrqSw== this is a comment.
+```
 
+##### **2.1.2：查看当前目录是否与远程仓库相关联**
+
+```shell
+# 查看当前目录是否是Git仓库以及Git仓库状态
+$ git status
+# 查看当前仓库是否添加了远程仓库
+$ git remote -v
+```
+
+##### **2.1.3：克隆一个远程仓库**
+
+```shell
+# 命令中的 “gitHubAlias” 为自定义的名字，clone完成之后，仓库将处于这个自定义名字的文件夹下。
+# 如果不填，那么这个仓库的文件夹名默认为远程仓库的名字。
+$ git clone https://github.com/git/git.git  gitHubAlias
+```
+
+##### **2.1.4：如果本地没有仓库，需要新建本地仓库，并且将本地仓库与空的远程仓库相关联。**
+
+```shell
+# 创建README.md文件，将引号中的字符串写入该文件中
+$ echo "# gittest" >> README.md
+# 初始化一个本地仓库
+$ git init
+# 让Git跟踪监控README.md文件，如果不这样做，Git将不会管这个文件。
+$ git add README.md
+# 将被跟踪文件的变更提交到本地仓库
+$ git commit -m "first commit"
+# 在本地仓库添加远程仓库。一个本地仓库可添加多个远程仓库。对本地仓库来说只是添加了一个别名而已。
+$ git remote add origin https://github.com/niroshea/gittest.git
+# 将本地仓库中的提交推送至远程仓库（别名origin）的master分支中。-u 参数：设置默认上传流。
+$ git push -u origin master
+```
+
+git push 介绍
+
+```shell
+# git push 使用本地的对应分支来更新对应的远程分支。
+$ git push <远程仓库> <本地分支名>:<远程分支名>
+# 注意: 命令中的本地分支是指将要被推送到远端的分支，而远程分支是指推送的目标分支，即将本地分支合并到远程分支。 
+# 如果省略远程分支名，则表示将本地分支推送与之存在”追踪关系”的远程分支(通常两者同名)，如果该远程分支不存在，则会被新建。
+$ git push origin master
+# 如果省略本地分支名，则表示删除指定的远程分支，因为这等同于推送一个空的本地分支到远程分支，这条命令是删除远程master分支。
+$ git push origin :master
+# 等同于
+$ git push origin --delete master
+# 如果当前分支与远程分支之间存在追踪关系（即分支名相同），则本地分支和远程分支都可以省略。
+$ git push origin
+# 如果当前分支只有一个追踪分支，那么主机名都可以省略。
+$ git push
+# 如果当前分支与多个主机存在追踪关系，则可以使用-u选项指定一个默认主机，这样后面就可以不加任何参数使用git push。
+$ git push -u origin master
+# 还有一种情况，就是不管是否存在对应的远程分支，将本地的所有分支都推送到远程主机，这时需要使用–all选项。
+$ git push --all origin
+# 如果远程主机的版本比本地版本更新，推送时Git会报错，要求先在本地做git pull合并差异，然后再推送到远程主机。这时，如果你一定要推送，可以使用–force选项。应该尽量避免使用–force选项。
+$ git push --force origin
+# 最后，git push不会推送标签(tag)，除非使用–tags选项。
+$ git push origin --tags
+```
+
+##### **2.1.5：本地已有仓库，需将本地仓库与远程仓库相关联，并将本地仓库中的提交推送至空的远程仓库。**
+
+```shell
+# 将本地仓库与远程仓库(别名origin)相关联
+$ git remote add origin https://github.com/niroshea/gittest.git
+# 将本地仓库中的提交推送至远程仓库（别名origin）的master分支中。-u 参数：设置默认上传流。
+$ git push -u origin master
+```
+
+##### **2.1.6：如果远程仓库不为空，且内容不可忽略，需将本地仓库与远程仓库合并并且相关联。**
+
+```shell
+$ git remote add origin https://github.com/niroshea/gittest.git
+# 将远程仓库的所有提交合并至本地仓库。
+$ git pull origin
+```
+
+git pull 介绍
+
+```shell
+# git pull 获取并合并其他的仓库，或者本地的其他分支。
+$ git pull <远程仓库> <远程分支>:<本地分支>
+# 将origin厂库的master分支拉取并合并到本地的my_test分支上。
+$ git pull origin master:my_test
+# 如果省略本地分支，则将自动合并到当前所在分支上。如下：
+$ git pull origin master
+```
+
+##### **2.1.7：需要拉取远程仓库到本地仓库，先查看区别，再进行合并。**
+
+```shell
+$ git fetch origin master:temp 
+#在本地新建一个temp分支，并将远程origin仓库的master分支代码下载到本地temp分支
+$ git diff temp 
+#来比较本地代码与刚刚从远程下载下来的代码的区别
+$ git merge temp
+#合并temp分支到本地的master分支
+$ git branch -d temp
+#如果不想保留temp分支 可以用这步删除
+```
+
+##### **2.1.8：拉取远程非master分支**
+
+```shell
+# 拉取远程仓库origin的dev分支并且合并至本地master分支
+$ git pull origin dev:master
+```
+
+
+
+查看当前位置的远程仓库：
+
+```shell
+$ git remote -v
+origin	git@github.com:git/git.git (fetch)
+origin	git@github.com:git/git.git (push)
+```
+
+如果什么都没有输出，那么需要clone一个远程仓库：
 
 
 ```shell
 $ git clone https://github.com/git/git.git  gitHubAlias
 ```
 
-命令中的 “gitHubAlias” 为自定义的名字，仓库将处于这个自定义名字的文件夹下，如果不填，那么这个仓库的文件夹名默认为远程仓库的名字。
+命令中的 “gitHubAlias” 为自定义的名字，clone完成之后，仓库将处于这个自定义名字的文件夹下，如果不填，那么这个仓库的文件夹名默认为远程仓库的名字。
 
 ```shell
 $ cd gitHubAlias
@@ -346,6 +468,27 @@ origin	git@github.com:git/git.git (push)
 ```
 
 在clone完一个仓库之后，至少可以看到一个名为origin的远程仓库，Git默认使用origin来表示我们所clone的原始仓库。
+
+添加远程仓库
+
+```shell
+$ git remote add origin https://github.com/git/git.git
+# 上述命令和下面的命令除了名字没什么区别。
+$ git remote add atest https://github.com/git/git.git
+```
+
+`origin` 或者 `atest` 都只是 `https://github.com/git/git.git` 别名，以后操作远程仓库的时候，就用不着打那么多字符了，用别名替代即可，省事。
+
+比如说，要抓取所有远程仓库有的，但本地仓库没有的信息，可以运行 `git fetch atest`：
+
+```shell
+$ git fetch atest
+* [new branch] master -> atest/master
+```
+
+此时，本地master分支对应于远程仓库的master分支
+
+
 
 #### 2.2 获取Git仓库
 
