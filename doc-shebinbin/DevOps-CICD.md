@@ -346,6 +346,8 @@ $ git remote -v
 ```shell
 # 命令中的 “gitHubAlias” 为自定义的名字，clone完成之后，仓库将处于这个自定义名字的文件夹下。
 # 如果不填，那么这个仓库的文件夹名默认为远程仓库的名字。
+# Git 支持许多数据传输协议。之前的例子使用的是 git:// 协议，不过你也可以用 http(s):// 或者 
+# user@server:/path.git 表示的 SSH 传输协议。
 $ git clone https://github.com/git/git.git  gitHubAlias
 ```
 
@@ -438,65 +440,185 @@ $ git branch -d temp
 ```shell
 # 拉取远程仓库origin的dev分支并且合并至本地master分支
 $ git pull origin dev:master
+# 修改之后，如果需要提交至远程仓库，执行如下命令即可。
+$ git push origin master:dev
 ```
 
+#### 2.2 创建、删除本地Git仓库
 
-
-查看当前位置的远程仓库：
+创建Git仓库、添加追踪
 
 ```shell
-$ git remote -v
-origin	git@github.com:git/git.git (fetch)
-origin	git@github.com:git/git.git (push)
+# 要对现有的某个项目开始用 Git 管理，只需到此项目所在的目录，执行：
+$ git init
+# 初始化后，在当前目录下会出现一个名为 .git 的目录，所有 Git 需要的数据和资源都存放在这个目录中。
+$ ls -la
+drwxr-xr-x  3 nero nero 4096 1月  31 15:40 .
+drwxr-xr-x 56 nero nero 4096 1月  31 15:40 ..
+drwxr-xr-x  7 nero nero 4096 1月  31 15:40 .git
+# 使用 git add 命令告诉 Git 对文件以及文件的修改进行跟踪。
+# git add <文件名，或文件夹名>
+$ touch test.sh
+# Git跟踪新建的文件
+$ git add test.sh
+$ vim test.sh
+# Git跟踪文件的修改
+$ git add test.sh
+# 在Git仓库根目录执行如下命令，则仓库中所有的文件以及文件的修改都被跟踪。
+# 只有被Git跟踪的文件或文件的修改才能被提交。
+$ git add .
 ```
 
-如果什么都没有输出，那么需要clone一个远程仓库：
-
+删除Git仓库
 
 ```shell
-$ git clone https://github.com/git/git.git  gitHubAlias
+# 如果不希望Git纳管当前目录，执行如下命令：
+$ rm -rf .git
 ```
 
-命令中的 “gitHubAlias” 为自定义的名字，clone完成之后，仓库将处于这个自定义名字的文件夹下，如果不填，那么这个仓库的文件夹名默认为远程仓库的名字。
+忽略某些文件
 
 ```shell
-$ cd gitHubAlias
-# -v 参数可以查看远程仓库的链接。
-$ git remote -v
-origin	git@github.com:git/git.git (fetch)
-origin	git@github.com:git/git.git (push)
+# 如何让git忽略某些文件呢，编辑 .gitignore
+$ cat .gitignore
+# 忽略以.a或者.o结尾的文件
+*.[oa]
+# 忽略以~结尾的文件
+*~
+# 忽略以.~开头的文件
+.~*
+# 但 lib.a 除外
+!lib.a
+# 仅仅忽略项目根目录下的 TODO 文件，不包括 subdir/TODO
+/TODO
+# 忽略 build/ 目录下的所有文件
+build/
+# 会忽略 doc/notes.txt 但不包括 doc/server/arch.txt
+doc/*.txt
+
+# 可能还需要忽略 log，tmp 或者 pid 目录，以及自动生成的文档等等。
+# 要养成一开始就设置好 .gitignore 文件的习惯，以免将来误提交这类无用的文件。
 ```
 
-在clone完一个仓库之后，至少可以看到一个名为origin的远程仓库，Git默认使用origin来表示我们所clone的原始仓库。
-
-添加远程仓库
+文件 .gitignore 的格式规范如下：
 
 ```shell
-$ git remote add origin https://github.com/git/git.git
-# 上述命令和下面的命令除了名字没什么区别。
-$ git remote add atest https://github.com/git/git.git
+# 1、所有空行或者以注释符号 ＃ 开头的行都会被 Git 忽略。
+# 2、可以使用标准的 glob 模式匹配。
+# 3、匹配模式最后跟反斜杠（/）说明要忽略的是目录。
+# 4、要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号（!）取反。
+# 所谓的 glob 模式是指 shell 所使用的简化了的正则表达式。星号（*）匹配零个或多个任意字符；[abc] 匹配任何一个列在方括号中的字符（这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）；问号（?）只匹配一个任意字符；如果在方括号中使用短划线分隔两个字符，表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。
 ```
-
-`origin` 或者 `atest` 都只是 `https://github.com/git/git.git` 别名，以后操作远程仓库的时候，就用不着打那么多字符了，用别名替代即可，省事。
-
-比如说，要抓取所有远程仓库有的，但本地仓库没有的信息，可以运行 `git fetch atest`：
-
-```shell
-$ git fetch atest
-* [new branch] master -> atest/master
-```
-
-此时，本地master分支对应于远程仓库的master分支
-
-
-
-#### 2.2 获取Git仓库
 
 #### 2.3 Git更新、提交、撤销操作
 
+<img src="./Pictures/gitflow-2.png" style="width:100px height:150px"/>
+
+<div align="center">图2.3-1 Git操作与仓库之间的关系</div>
+
+```shell
+# 查看当前仓库的状态，哪些文件追踪、未追踪，哪些文件的修改追踪、未追踪，哪些追踪没有提交都会提示出来。
+$ git status
+```
+
+如图2.3-1所示，如果要查看**未跟踪区**和**暂存区**间修改了什么地方，可以用 git diff 命令：
+
+```shell
+# 实际上 git status 的显示比较简单，仅仅是列出了修改过的文件。
+# 如果要查看具体修改了什么地方，可以用 git diff 命令
+$ git diff
+# 此命令比较的是工作目录中当前文件和暂存区域快照之间的差异，也就是修改之后还没有暂存起来的变化内容。
+```
+
+如果要查看**暂存区**和**本地仓库**之间的不同，执行如下命令：
+
+```shell
+$ git diff --cached
+# Git 1.6.1 及更高版本还允许使用 git diff --staged，效果是相同的。
+$ git diff --staged
+```
+
+提交更新：
+
+```shell
+# 想要提交暂存区的内容时，执行git commit 将会将暂存区的内容提交至git仓库中
+$ git commit
+# 执行之后会弹出默认编辑器，让你输入提交的备注。
+# Git是用于项目管理的，别人不知道你提交了什么，如何管理项目。尽量详细写提交备注（可以使用中文）。
+
+# 如果实在没什么好说的，备注很简短，使用如下命令（可以使用中文）：
+$ git commit -m "我的备注"
+```
+
+跳过暂存区，直接提交
+
+```shell
+# 尽管使用暂存区域的方式可以精心准备要提交的细节，但有时候这么做略显繁琐。
+# Git 提供了一个跳过使用暂存区域的方式。
+# 只要在提交的时候，给 git commit 加上 -a 选项。
+# Git 就会自动把所有已经跟踪过的文件暂存起来一并提交，从而跳过 git add 步骤：
+$  git commit -a -m "我的备注"
+```
+
+移除文件
+
+```shell
+# 1、如果该文件未跟踪，通过OS的命令删除文件
+$ rm -f test.go
+# 2、如果该文件已跟踪、未修改状态，通过git rm删除
+$ git rm test.go
+# 3、如果该文件已跟踪、修改未跟踪，通过git rm -f 删除
+$ git rm -f test.go
+# 4、如果该文件已跟踪，想删除Git仓库的追踪，但在本地工作区保留该文件。
+$ git rm --cached test.go
+# glob正则式批量删除文件
+$ git rm log/\*.log
+$ git rm \*~
+```
+
+移动文件
+
+```shell
+# Git 并不跟踪文件移动操作。
+# 如果在 Git 中重命名了某个文件，仓库中存储的元数据并不会体现出这是一次改名操作。
+# 不过 Git 非常聪明，它会推断出究竟发生了什么。
+# 重命名某个文件。
+$ git mv test.go dev.go
+```
+
+git mv 命令在Git看来是运行了如下三个命令：
+
+```shell
+$ mv README.txt README
+$ git rm README.txt
+$ git add README
+# 不管以什么方式，都一样。
+```
+
+撤销操作
+
+```shell
+# 有些撤销操作是不可逆的，所以请务必谨慎小心，一旦失误，就有可能丢失部分工作成果。
+```
+
+修改最后一次提交
+
+```shell
+# 有时候我们提交完了才发现漏掉了几个文件没有加，或者提交信息写错了。
+# 想要撤消刚才的提交操作，可以使用 --amend 选项重新提交
+$ git add test.go dev.go prod.go
+$ git commit --amend -m "我的备注"
+```
+
+
+
 #### 2.4 Git查看提交记录
 
+
+
 #### 2.5 Git中打版本标签
+
+
 
 #### 2.6 Git分支管理
 
