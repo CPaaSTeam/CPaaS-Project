@@ -597,8 +597,8 @@ $ git add README
 
 撤销操作
 
-```shell
-# 有些撤销操作是不可逆的，所以请务必谨慎小心，一旦失误，就有可能丢失部分工作成果。
+```tex
+有些撤销操作是不可逆的，所以请务必谨慎小心，一旦失误，就有可能丢失部分工作成果。
 ```
 
 修改最后一次提交
@@ -606,31 +606,309 @@ $ git add README
 ```shell
 # 有时候我们提交完了才发现漏掉了几个文件没有加，或者提交信息写错了。
 # 想要撤消刚才的提交操作，可以使用 --amend 选项重新提交
+$ git commit -m 'initial commit'
 $ git add test.go dev.go prod.go
 $ git commit --amend -m "我的备注"
 ```
 
+取消已暂存的文件
 
+```shell
+$ git add test.go
+$ git status
+# 位于分支 master
+# 要提交的变更：
+#   （使用 "git reset HEAD <文件>..." 以取消暂存）
+
+# 	修改：     test.go
+$ git reset HEAD test.go
+# 上述命令只是取消了暂存，但是工作区的内容没有变化
+```
+
+取消对文件的修改
+
+```shell
+$ git checkout -- test.go
+# 所有对文件的修改都没有了，因为我们刚刚把之前版本的文件复制过来重写了此文件
+
+# 任何已经提交到 Git 的都可以被恢复。
+# 即便在已经删除的分支中的提交，或者用 --amend 重新改写的提交，都可以被恢复。
+# 所以，你可能失去的数据，仅限于没有提交过的，对 Git 来说它们就像从未存在过一样。
+```
 
 #### 2.4 Git查看提交记录
 
+```tex
+在提交了若干更新之后，又或者克隆了某个项目，想回顾下提交历史，可以使用 git log 命令查看。
+```
 
+```shell
+$ git log
+commit e5d4a56997db994b48fea0e671909606fef1c0aa (HEAD -> master)
+Author: Administrator <nero@gitlab.nero.com>
+Date:   Fri Feb 1 09:47:06 2019 +0800
+
+    changed the version number
+
+commit d7ad2c1823e55499f36eb7603dac1be2fa0ec682
+Author: Administrator <nero@gitlab.nero.com>
+Date:   Fri Feb 1 09:39:15 2019 +0800
+
+    removed unnecessary test code
+
+commit 308de3252b50afb27e1daa2d0d974db7743acedd
+Author: Administrator <nero@gitlab.nero.com>
+Date:   Fri Feb 1 09:24:38 2019 +0800
+
+    first commit
+
+# 默认不用任何参数的话，git log 会按提交时间列出所有的更新，最近的更新排在最上面。
+# 每次更新都有一个 SHA-1 校验和、作者的名字和电子邮件地址、提交时间，最后缩进一个段落显示提交说明。
+```
+
+git log 参数
+
+```shell
+# git log 有许多选项可以帮助你搜寻感兴趣的提交，接下来我们介绍些最常用的。
+# -p 参数：展开显示每次提交的内容差异；-1 仅显示最近的一次更新
+$ git log -p -1
+# --stat，仅显示简要的增改行数统计
+$ git log --stat
+# 常用的 --pretty 选项，可以指定使用完全不同于默认格式的方式展示提交历史。
+# 比如用 oneline 将每个提交放在一行显示，这在提交数很大时非常有用。
+$ git log --pretty=oneline
+# 另外还有 short，full 和 fuller 可以用，展示的信息或多或少有些不同
+$ git log --pretty=short
+$ git log --pretty=full
+$ git log --pretty=fuller
+
+# format，可以定制要显示的记录格式，这样的输出便于后期编程提取分析：
+$ git log --pretty=format:"%h - %an, %ar : %s"
+```
+
+常用的格式占位符写法及其代表的意义
+
+```shell
+选项 说明
+    %H 提交对象（commit）的完整哈希字串
+    %h 提交对象的简短哈希字串
+    %T 树对象（tree）的完整哈希字串
+    %t 树对象的简短哈希字串
+    %P 父对象（parent）的完整哈希字串
+    %p 父对象的简短哈希字串
+    %an 作者（author）的名字
+    %ae 作者的电子邮件地址
+    %ad 作者修订日期（可以用 -date= 选项定制格式）
+    %ar 作者修订日期，按多久以前的方式显示
+    %cn 提交者(committer)的名字
+    %ce 提交者的电子邮件地址
+    %cd 提交日期
+    %cr 提交日期，按多久以前的方式显示
+    %s 提交说明
+```
+
+```shell
+# 用 oneline 或 format 时结合 --graph 选项，可以看到开头多出一些 ASCII 字符串表示的简单图形
+$ git log --pretty=format:"%h %s" --graph
+```
+
+git log 一些其他常用的选项及其释义
+
+```shell
+选项 说明
+    -p 按补丁格式显示每个更新之间的差异。
+    --stat 显示每次更新的文件修改统计信息。
+    --shortstat 只显示 --stat 中最后的行数修改添加移除统计。
+    --name-only 仅在提交信息后显示已修改的文件清单。
+    --name-status 显示新增、修改、删除的文件清单。
+    --abbrev-commit 仅显示 SHA-1 的前几个字符，而非所有的 40 个字符。
+    --relative-date 使用较短的相对时间显示（比如，“2 weeks ago”）。
+    --graph 显示 ASCII 图形表示的分支合并历史。
+    --pretty 使用其他格式显示历史提交信息。可用的选项包括 oneline，short，full，fuller 和 		format（后跟指定格式）。
+```
+
+按照时间作限制的选项，比如 `--since` 和 `--until`
+
+```shell
+# 下面的命令列出所有最近两周内的提交
+$ git log --since=2.weeks
+# 列出所有2019年以来的提交
+$ git log --since="2019-01-01" 
+# 列出多长时间之内的提交
+$ git log --since="2 years 1 day 3 minutes ago"
+# 查看 Git 仓库中，2018 年 10 月期间，nero 提交的但未合并的测试脚本
+# （位于项目的 t/ 目录下的文件）
+$ git log --pretty="%h - %s" --author=nero --since="2018-10-01" \
+    --before="2018-11-01" --no-merges -- t/
+```
+
+使用图形化工具查阅提交历史：gitk、GitKraken
+
+gitk
+
+```shell
+# 有时候图形化工具更容易展示历史提交的变化，随 Git 一同发布的 gitk 就是这样一种工具。
+# 它是用 Tcl/Tk 写成的，基本上相当于 git log 命令的可视化版本。
+# 凡是 git log 可以用的选项也都能用在 gitk 上。
+# 需要自行安装。
+```
+
+GitKraken
+
+```shell
+# gitKraken，这款工具操作比较方便，UI也是我喜欢的风格。
+# 对没有太多git使用经验的新手比较友好，学习成本相对较低。
+# 尤其喜欢的一点就是它的分支和提交非常清晰。
+# 官网地址：https://www.gitkraken.com/
+```
 
 #### 2.5 Git中打版本标签
 
+我们在发布某个软件版本（如 v2.1 ）的时候，经常需要给某一时间点上的版本打上标签。Git支持上述操作。本节我们将学习如何新建标签、列出所有可用的标签、各种不同类型标签之间的差别。
 
+查看标签
+
+```shell
+#列出现有标签。在Git仓库目录下执行：
+# 显示的标签按字母顺序排列。
+$ git tag
+	v1.2
+	v2.5
+# 可以用特定的搜索模式列出符合条件的标签。
+$ git tag -l 'v2.1.3.*'
+    v2.1.3.1
+    v2.1.3.2
+    v2.1.3.3
+```
+
+新建标签
+
+```shell
+# Git 使用的标签有两种类型：轻量级的（lightweight）和含附注的（annotated）。
+# 1、轻量级标签就像是个不会变化的分支，实际上它就是个指向特定提交对象的引用。
+# 不需要带任何参数
+$ git tag v2.0
+# 查看v2.0标签信息
+$ git show v2.0 
+# 2、含附注标签，实际上是存储在仓库中的一个独立对象，它有自身的校验和信息。
+# -a （译注：取 annotated 的首字母）指定标签名字：
+$ git tag -a v2.1 -m "标签说明v2.1"
+# 包含着标签的名字、电子邮件、日期、标签说明。
+$ git show v2.1
+# 标签允许使用 GNU Privacy Guard (GPG) 来签署或验证。
+# 只需要把之前的 -a 改为 -s （译注： 取 signed 的首字母）（需安装GPG）。
+$ git tag -s v2.2 -m '标签说明v2.2'
+# 运行 git show 会看到对应的 GPG 签名也附在其内
+$ git show v2.2
+# 一般我们都建议使用含附注型的标签，以便保留相关信息；
+# 如果只是临时性加注标签，或者不需要旁注额外信息，用轻量级标签也没问题
+```
+
+验证标签
+
+```shell
+# git tag -v [tag-name] （译注：取 verify 的首字母）的方式验证已经签署的标签。
+# 此命令会调用 GPG 来验证签名，所以你需要有签署者的公钥，存放在 keyring 中，才能验证
+# 如果没有签署者的公钥，会报错。
+$ git tag -v v2.2
+```
+
+后期加注标签
+
+```shell
+# 如果早前的某次提交忘记打标签，可以补打标签
+$ git log --pretty=oneline
+e5d4a56997db994b48fea0e671909606fef1c0aa (HEAD -> master) commitInfo3 
+d7ad2c1823e55499f36eb7603dac1be2fa0ec682 commitInfo2
+308de3252b50afb27e1daa2d0d974db7743acedd commitInfo1
+
+# 如果想要给 commitInfo2 打上版本号，只要在git tag 后跟上相应的hash值即可
+$ git tag -a v2.4 d7ad2c182
+# 使用 git tag 命令查看
+$ git tag
+```
+
+上传标签至远程服务器
+
+```shell
+# 默认情况下，git push 并不会把标签传送到远端服务器上，只有通过显式命令才能分享标签到远端仓库
+# 其命令格式如同推送分支，运行 git push origin [tagname] 即可
+$ git push origin v2.4
+# 一次推送所有本地新增的标签上去，可以使用 --tags 选项
+$ git push origin --tags
+# 现在，其他人克隆共享仓库或拉取数据同步后，也会看到这些标签。
+```
 
 #### 2.6 Git分支管理
 
-管理各式远程库分支，定义是否跟踪这些分支，等等
+> 管理各式远程库分支，定义是否跟踪这些分支，等等。
 
-#### 2.7 Git别名以及命令自动补全
+版本控制器分支功能的意义就在于，我们可以使用分支功能将当前的工作从开发主线上分离开来，然后在不影响主线的同时继续工作。在很多版本控制系统中，这是个昂贵的过程，但对于Git来说却是非常轻松的事情。理解分支的概念并熟练运用后，你才会意识到为什么 Git 是一个如此强大而独特的工具，并从此真正改变你的开发方式。
 
-#### 
+
+
+#### 2.7 Git常用小技巧
+
+本小节，与到家分享Git使用的小技巧，会使得Git 的使用更加简单、方便、轻松、高效。
+
+自动补全功能
+
+```shell
+# 如果是windows，默认使用Git Bash，输入Git命令的时候敲两次Tab键。可以看到所有可用命令。
+$ git pu<tab><tab>
+	pull push
+$ git log --s<tab>
+
+# 如果是Linux或者Mac，使用Bash shell，可以试试tab键，如果无法使用。
+# 下载 Git 的源代码，进入 contrib/completion 目录，会看到一个 git-completion.bash 文件。
+# 将此文件复制到你自己的用户主目录中
+$ cp git-completion.bash ~/.git-completion.bash
+# 并把下面一行内容添加到你的 .bashrc 文件中
+$ source ~/.git-completion.bash
+# Mac 上将此脚本复制到 /opt/local/etc/bash_completion.d 目录中
+# Linux 上则复制到 /etc/bash_completion.d/ 目录中
+```
+
+Git命令别名
+
+```shell
+# 如果想偷懒，少敲几个命令的字符，可以用 git config 为命令设置别名
+# 下面的命令中，将checkout 别名为 co
+$ git config --global alias.co checkout
+# 以后当使用到checkout相关的命令时，可以按照如下方式执行：
+# 相当于 git checkout test.go
+$ git co test.go
+```
+
+Git命令别名最佳实践
+
+```shell
+# 设置 git status 为 git st
+$ git config --global alias.st status
+# 设置 git checkout 为 git co
+$ git config --global alias.co checkout
+# 设置 git commit 为 git ci
+$ git config --global alias.ci commit
+# 设置 git branch 为 git br
+$ git config --global alias.br branch
+# 设置 git reset HEAD -- test.go 为 git unstage test.go
+$ git config --global alias.unstage 'reset HEAD --'
+# 设置 git log -1 HEAD 为 git last
+$ git config --global alias.last 'log -1 HEAD'
+# 设置 git log 为 git lg
+$ git config --global alias.lg "log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+
+# 有时候我们希望运行某个外部命令，而非 Git 的子命令，这个好办，只需要在命令前加上 ! 就行
+# 如果你自己写了些处理 Git 仓库信息的脚本的话，就可以用这种技术包装起来.
+# 我们可以设置用 git visual 启动 gitk。
+$ git config --global alias.visual '!gitk'
+```
 
 ### 3、Git项目协作规范
 
 （企业级架构，是否有成熟的Git的落地方案，网络、操作系统、磁盘、CPU、内存）
+
+docker部署方式，共享数据库和数据磁盘？
 
 ### 4、Git成为CICD利器
 
