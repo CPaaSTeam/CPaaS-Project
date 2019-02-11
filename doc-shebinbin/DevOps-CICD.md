@@ -446,7 +446,7 @@ $ git push origin master:dev
 
 #### 2.2 创建、删除本地Git仓库
 
-创建Git仓库、添加追踪
+##### 2.2.1 创建Git仓库、添加追踪
 
 ```shell
 # 要对现有的某个项目开始用 Git 管理，只需到此项目所在的目录，执行：
@@ -469,14 +469,14 @@ $ git add test.sh
 $ git add .
 ```
 
-删除Git仓库
+##### 2.2.2 解除Git纳管
 
 ```shell
 # 如果不希望Git纳管当前目录，执行如下命令：
 $ rm -rf .git
 ```
 
-忽略某些文件
+##### 2.2.3 忽略某些文件
 
 ```shell
 # 如何让git忽略某些文件呢，编辑 .gitignore
@@ -510,7 +510,7 @@ doc/*.txt
 # 所谓的 glob 模式是指 shell 所使用的简化了的正则表达式。星号（*）匹配零个或多个任意字符；[abc] 匹配任何一个列在方括号中的字符（这个例子要么匹配一个 a，要么匹配一个 b，要么匹配一个 c）；问号（?）只匹配一个任意字符；如果在方括号中使用短划线分隔两个字符，表示所有在这两个字符范围内的都可以匹配（比如 [0-9] 表示匹配所有 0 到 9 的数字）。
 ```
 
-#### 2.3 Git更新、提交、撤销操作
+#### 2.3 Git对比差异、提交、撤销操作
 
 <img src="./Pictures/gitflow-2.png" style="width:100px height:150px"/>
 
@@ -520,6 +520,8 @@ doc/*.txt
 # 查看当前仓库的状态，哪些文件追踪、未追踪，哪些文件的修改追踪、未追踪，哪些追踪没有提交都会提示出来。
 $ git status
 ```
+
+##### 2.3.1 对比差异
 
 如图2.3-1所示，如果要查看**未跟踪区**和**暂存区**间修改了什么地方，可以用 git diff 命令：
 
@@ -538,7 +540,7 @@ $ git diff --cached
 $ git diff --staged
 ```
 
-提交更新：
+##### 2.3.2 提交更新
 
 ```shell
 # 想要提交暂存区的内容时，执行git commit 将会将暂存区的内容提交至git仓库中
@@ -595,11 +597,9 @@ $ git add README
 # 不管以什么方式，都一样。
 ```
 
-撤销操作
+##### 2.3.3 撤销操作
 
-```tex
-有些撤销操作是不可逆的，所以请务必谨慎小心，一旦失误，就有可能丢失部分工作成果。
-```
+> Tips：有些撤销操作是不可逆的，所以请务必谨慎小心，一旦失误，就有可能丢失部分工作成果。
 
 修改最后一次提交
 
@@ -607,6 +607,7 @@ $ git add README
 # 有时候我们提交完了才发现漏掉了几个文件没有加，或者提交信息写错了。
 # 想要撤消刚才的提交操作，可以使用 --amend 选项重新提交
 $ git commit -m 'initial commit'
+# 如果此时后悔了，进行如下操作。
 $ git add test.go dev.go prod.go
 $ git commit --amend -m "我的备注"
 ```
@@ -636,11 +637,51 @@ $ git checkout -- test.go
 # 所以，你可能失去的数据，仅限于没有提交过的，对 Git 来说它们就像从未存在过一样。
 ```
 
+##### 2.3.4 回退版本
+
+```shell
+# 下面两个命令是等同的，官方建议的版本回退方式。
+# 执行命令之后，回退了git commit以及git add操作，工作区内容没有被覆盖。
+$ git reset HEAD^
+$ git reset --mixed HEAD^
+# 执行下面的命令之后，回退了git commit操作，工作区内容没有被覆盖。
+$ git reset --soft HEAD^
+# 执行下面的命令之后，回退了git commit和git add操作，工作区内容被覆盖。
+# 此时工作区的内容被上一版本的内容覆盖。
+$ git reset --hard HEAD^
+# 回退指定版本
+# 使用git log命令查看指定版本的hash值
+$ git log
+commit e5d4a56997db994b48fea0e671909606fef1c0aa (HEAD -> master)
+Author: Administrator <nero@gitlab.nero.com>
+Date:   Fri Feb 1 09:47:06 2019 +0800
+
+    changed the version number
+
+commit d7ad2c1823e55499f36eb7603dac1be2fa0ec682
+Author: Administrator <nero@gitlab.nero.com>
+Date:   Fri Feb 1 09:39:15 2019 +0800
+
+    removed unnecessary test code
+
+commit 308de3252b50afb27e1daa2d0d974db7743acedd
+Author: Administrator <nero@gitlab.nero.com>
+Date:   Fri Feb 1 09:24:38 2019 +0800
+
+    first commit
+# 然后当前的需求，执行下列其中一条命令即可
+$ git reset 308de3252b50
+$ git reset --soft 308de3252b50
+$ git reset --hard 308de3252b50
+# 这里有一个注意点：如果通过git reset --hard命令回退了版本，但后悔了，咋办？
+# 还记得上述git log中的记录吗，只要再次执行 git reset --hard 高版本号，就能回到之前的版本了
+$ git reset --hard e5d4a56997d
+# 通过上述命令仍然能够回到最新的版本上。但前提是得记得这个提交hash值，否则真的就回不去了：）
+```
+
 #### 2.4 Git查看提交记录
 
-```tex
-在提交了若干更新之后，又或者克隆了某个项目，想回顾下提交历史，可以使用 git log 命令查看。
-```
+> 在提交了若干更新之后，又或者克隆了某个项目，想回顾下提交历史，可以使用 git log 命令查看。
 
 ```shell
 $ git log
@@ -841,9 +882,120 @@ $ git push origin --tags
 
 #### 2.6 Git分支管理
 
-> 管理各式远程库分支，定义是否跟踪这些分支，等等。
+> 管理各式远程库分支，定义是否跟踪这些分支。
 
-版本控制器分支功能的意义就在于，我们可以使用分支功能将当前的工作从开发主线上分离开来，然后在不影响主线的同时继续工作。在很多版本控制系统中，这是个昂贵的过程，但对于Git来说却是非常轻松的事情。理解分支的概念并熟练运用后，你才会意识到为什么 Git 是一个如此强大而独特的工具，并从此真正改变你的开发方式。
+版本控制器分支功能的意义就在于，我们可以使用分支功能将当前的工作从开发主线上分离开来，然后在不影响主线的同时继续工作。在很多版本控制系统中，这是个昂贵的过程，但对于Git来说却是非常轻松的事情。所以，与大多数版本控制系统不同的是，Git 鼓励在工作流程中频繁使用分支与合并。理解分支的概念并熟练运用后，你才会意识到为什么 Git 是一个如此强大而独特的工具，并从此真正改变你的开发方式。
+
+##### 2.6.1 什么是Git分支
+
+在理解Git分支之前，我们回顾一下Git 是如何存储数据的。前面说过，Git 保存的不是文件差异或者变化量，而只是一系列文件快照。
+
+假设当前工作区有两个新增文件fileA和fileB，通过`git add`跟踪这两个文件，并且`git commit`提交，将会触发如下动作：
+
+* 执行`git add fileA fileB`
+* Git对这两个文件各做一次校验和计算（SHA-1算法）
+* 将fileA和fileB这两个文件当前的快照存储至Git仓库中（BLOB类型存储，Binary Large Object）
+* 将校验和加入暂存区
+* 执行`git commit -m "my comment"`
+* Git计算每一个子目录（包括项目根目录）的校验和
+* Git创建**tree对象**，将每一个子目录校验和保存在该对象中，并存储在Git仓库中
+* Git创建**提交对象**，包含着指向这个**tree对象**的指针
+
+在本场景下，一次提交产生了4个对象：一个提交对象，一个tree对象，一个fileA快照对象，一个fileB快照对象。如果进行了2次提交，那么fileA和fileB就有两个版本的快照。当然如果没有发生改变，Git不会进行重复的提交操作。如果fileA没有变化，fileB修改了，新的Git提交对象中的fileA快照指针仍然指向原来的快照，不会新建fileA快照。下图为提交对象与分支的对应关系图。
+
+<img src="./Pictures/分支对象图解.png" style="width:100px height:400px"/>
+
+<div align="center">图2.6.1-1 提交对象与分支</div>
+
+现在我们来理解什么是分支。分支的本质就是指向**提交对象**的可变指针。如下图所示，分支的本质就是图中的devGroup1指针。
+
+<img src="./Pictures/创建分支原理.png" style="width:100px height:250px"/>
+
+<div align="center">图2.6.1-2 分支创建示意图1</div>
+
+上图中只有一个master主分支，有三个指针：HEAD指针，master指针，devGroup1指针。
+
+* HEAD指针：永远指向当前工作区所在的提交对象上。图中HEAD指针指向master分支某次提交上。
+
+* master指针：永远指向主分支。
+
+* devGroup1指针：通过`git branch devGroup1`命令创建，该命令只能在当前提交对象上新建分支指针。如果需要切换提交对象，通过`git reset`命令切换提交对象（注意当前所在分支）。
+
+<img src="./Pictures/创建分支原理2.png" style="width:100px height:300px"/>
+
+<div align="center">图2.6.1-3 分支创建示意图2</div>
+
+如上图所示，devGroup1指针永远指向devGroup1分支，HEAD指针指向devGroup1分支某次提交上，也就是说我们当前的工作区正处在devGroup1分支上的某次提交上。
+
+理解了上述的三个指针的含义我们就来使用Git分支管理的命令了。
+
+<img src="./Pictures/分支创建切换图解.png" style="width:100px height:300px"/>
+
+<div align="center">图2.6.1-4 分支创建切换图解</div>
+
+创建分支
+
+```shell
+$ git branch devGroup1
+# 创建分支的开销就是创建一个指向当前提交对象的指针而已，相对其他大多数版本控制器而言，非常廉价。
+# 如图2.6.1-4所示
+```
+
+切换分支
+
+```shell
+# 创建分支并不等于切换了分支，需要执行如下命令才能切换分支。如图2.6.1-4所示
+$ git checkout devGroup1
+```
+
+<img src="./Pictures/分支切换提交图解.png" style="width:100px height:270px"/>
+
+<div align="center">图2.6.1-5 master和devGroup1分支相互切换提交图解</div>
+
+在devGroup1分支上提交一次
+
+```shell
+$ git commit -m "devGroup1"
+# 如图2.6.1-5中第一步所示
+```
+
+切换到master分支
+
+```shell
+$ git checkout master
+# 如图2.6.1-5中第二步所示
+```
+
+在master分支上提交一次
+
+```shell
+$ git commit -m "master"
+# 如图2.6.1-5中第三步所示
+```
+
+##### 2.6.2 新建、合并分支
+
+创建并切换至分支
+
+```shell
+# 创建并切换至fz1 分支，-b 参数：创建分支，checkout切换分支。
+$ git checkout -b fz1
+# 上述命令相当于下面两个命令
+$ git branch fz1
+$ git checkout fz1
+```
+
+将devGroup1分支合并至master
+
+```shell
+$ git checkout master
+$ git merge devGroup1
+# 注意：合并分支有可能产生冲突，但不要紧张，发现冲突点，修复冲突即可提交。
+```
+
+> Tips: 在合并分支之前，需要明确将哪个分支合并至哪个分支。如果将A分支合并至B分支，需要先切换至B分支，然后再执行git merge命令。
+
+
 
 
 
