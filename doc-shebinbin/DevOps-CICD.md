@@ -880,7 +880,7 @@ $ git push origin --tags
 # 现在，其他人克隆共享仓库或拉取数据同步后，也会看到这些标签。
 ```
 
-#### 2.6 Git分支管理
+#### 2.6 Git分支
 
 > 管理各式远程库分支，定义是否跟踪这些分支。
 
@@ -973,9 +973,7 @@ $ git commit -m "master"
 # 如图2.6.1-5中第三步所示
 ```
 
-##### 2.6.2 新建、合并分支
-
-创建并切换至分支
+##### 2.6.2 创建并切换至分支
 
 ```shell
 # 创建并切换至fz1 分支，-b 参数：创建分支，checkout切换分支。
@@ -985,9 +983,10 @@ $ git branch fz1
 $ git checkout fz1
 ```
 
-将devGroup1分支合并至master
+##### 2.6.3 合并分支
 
 ```shell
+# 将devGroup1分支合并至master
 $ git checkout master
 $ git merge devGroup1
 # 注意：合并分支有可能产生冲突，但不要紧张，发现冲突点，修复冲突即可提交。
@@ -995,7 +994,139 @@ $ git merge devGroup1
 
 > Tips: 在合并分支之前，需要明确将哪个分支合并至哪个分支。如果将A分支合并至B分支，需要先切换至B分支，然后再执行git merge命令。
 
+Fast forward 合并
 
+<img src="./Pictures/FastForward.png" style="width:100px height:300px"/>
+
+<div align="center">图2.6.3-1 将devGroup1分支合并至master分支</div>
+
+由于当前 `master` 分支所在的提交对象是要并入的 `devGroup1` 分支的直接上游，Git 只需把 `master`分支指针直接右移。这种合并方式称为Fast Forward 合并，只需要移动master指针，开销非常小。
+
+常规Git合并
+
+<img src="./Pictures/CommonMerge.png" style="width:100px height:300px"/>
+
+<div align="center">图2.6.3-2 将devGroup1分支合并至master分支2</div>
+
+不同于Fast Forward 合并的是，当前master指针指向的并不是devGroup1分支的直接祖先，Git 不得不进行一些额外处理。如上图2.6.3-2所示，Git会使用当前master指针指向的提交对象C2，以及当前devGroup1指针指向的提交对象C3，以及C2和C3的共同祖先C1进行一次简单的三方合并计算（见图中三个红色的圆），并自动创建一个指向当前HEAD所在分支的提交对象C4。此时C4的父指针就有两个，分别指向C2和C3。值得一提的是 Git 可以自己裁决哪个共同祖先才是最佳合并基础。
+
+##### 2.6.4 Git合并遇到冲突
+
+有时候合并操作并不会如此顺利。如果在不同的分支中都修改了同一个文件的同一部分，Git 就无法干净地把两者合到一起。
+
+```shell
+# 当合并遇到冲突时，会提示如下信息：
+$ git merge devGroup1
+	CONFLICT (content): Merge conflict in xxxx
+```
+
+Git 作了合并，但没有提交，它会停下来等你解决冲突。要看看哪些文件在合并时发生冲突，可以用 `git status` 查阅。
+
+```shell
+# 运行如下命令之后，会提示未合并的路径
+$ git status
+```
+
+查看遇到冲突的文件
+
+```shell
+$ cat test.txt
+<<<<<<< HEAD
+2222
+=======
+111111
+>>>>>>> dev
+```
+
+在合并发生冲突的时候，Git会在冲突的地方自动添加`<<<<<<<`、`=======`和`>>>>>>>`。其中`=======`分隔了两个分支冲突的内容，`<<<<<<<`部分为当前所在分支的内容，`>>>>>>>`为另一个分支的内容。解决冲突的办法无非是二者选其一或者由你亲自整合到一起。解决冲突过程中需要手动删除Git自动添加的`<<<<<<<`、`=======`和`>>>>>>>`。
+
+在解决了所有文件里的所有冲突后，运行 `git add` 将把它们标记为已解决状态。再次提交即完成了此次合并操作。
+
+如果你想用一个有图形界面的工具来解决这些问题，不妨运行 `git mergetool`，它会调用一个可视化的合并工具并引导你解决所有冲突。
+
+```shell
+$ git mergetool
+```
+
+上述命令需要你设置Git默认的合并工具`merge.tool`参数。
+
+```shell
+$ git config --global merge.tool vimdiff
+```
+
+这里我们选择的了vimdiff，Git目前支持meld、opendiff、kdiff3、 tkdiff 、xxdiff 、tortoisemerge 、gvimdiff 、diffuse 、diffmerge 、ecmerge 、p4merge 、araxis、 bc 、codecompare、 emerge 、vimdiff。读者可自行选择。
+
+合并遇到冲突的几个场景如下：
+
+* 情景一：多个分支代码合并到一个分支时；
+* 情景二：多个分支向同一个远程分支push代码时；
+* 情景三：从远程分支向本地仓库pull代码时；
+
+实际上，push操作即是将本地代码merge到远端库分支上。push和pull其实就分别是用本地分支合并到远程分支 和 将远程分支合并到本地分支，所以这两个过程中也可能存在冲突。
+
+git的合并中产生冲突的具体情况：
+
+* 两个分支中修改了同一个文件（不管什么地方）
+* 两个分支中修改了同一个文件的名称
+
+两个分支中分别修改了不同文件中的部分，不会产生冲突，可以直接将两部分合并。
+
+需要手工方式去解决冲突。
+
+* 情景一：查看冲突的文件以及文件内容，在当前分支上，修改冲突代码-->add-->commit-->merge。
+* 情景二：在本地当前分支上，修改冲突代码-->add-->commit-->push。
+* 情景三：将冲突的文件备份至仓库以外的位置，执行pull操作，然后修改冲突文件执行提交操作。
+
+##### 2.6.5 删除分支
+
+完成合并之后，删除分支
+
+```shell
+# 分支合并至主分支之后，分支如果完成了它的使命，我们就可以删除它了。
+$ git branch -d devGroup1
+```
+
+未完成合并，删除分支（不建议这样做，会导致分支上的修改全部丢失）
+
+```shell
+# 未完成合并，使用上述命令是无法删除分支的
+$ git branch -D devGroup1
+```
+
+> Tips：如果当前正处于要删除的分支上，执行上述命令是无法删除分支的，要先checkout至其他分支上。
+
+##### 2.6.6 分支查看
+
+我们已经学会了创建、合并、删除分支。除此之外，我们还需要学习如何查看分支，这样才能管理分支。
+
+```shell
+# 查看当前所有分支
+$ git branch -a
+  dev
+* master
+```
+
+> 分支前的 `*` 字符：它表示当前所在的分支
+
+查看各分支最后一次提交的信息
+
+```shell
+$ git branch -v
+```
+
+查看哪些分支已被并入当前分支，也就是说哪些分支是当前分支的直接上游
+
+```shell
+$ git branch --merge 
+```
+
+查看未发生合并操作的分支
+
+```shell
+$ git branch --no-merged
+```
+
+##### 2.6.7 远程分支
 
 
 
